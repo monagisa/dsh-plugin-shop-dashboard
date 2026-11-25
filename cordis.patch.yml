@@ -1,0 +1,7 @@
+# dsh-plugin-shop-dashboard —— cordis 挂载补丁
+#
+# `name` 必须是发布包名（加载器拿它当 import 说明符）。
+# `id` 是 cordis 行 id，也是「设置 → 插件」那一行的命名空间。
+- insert:
+    - id: shop-dashboard
+      name: "dsh-plugin-shop-dashboard"

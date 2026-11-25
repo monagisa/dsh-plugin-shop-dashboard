@@ -1,0 +1,31 @@
+{
+  "name": "dsh-plugin-shop-dashboard",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "店铺数据看板：把店铺账号管理插件已经采集到的工作簿聚合成经营看板（成交金额、退款金额、推广花费、销售收入、客单价、访客数、支付买家数、成交转化率，含每期对比与每日走势）",
+  "keywords": [
+    "dsh-plugin",
+    "dsh",
+    "dashboard",
+    "ecommerce"
+  ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "CHANGELOG.md",
+    "test"
+  ],
+  "scripts": {
+    "check": "node tools/check-syntax.mjs",
+    "test": "node test/features.mjs"
+  }
+}
