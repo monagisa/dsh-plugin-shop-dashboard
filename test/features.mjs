@@ -47,6 +47,28 @@ check('A8 只读：源码里没有写文件调用', () => {
   }
 });
 
+// A9–A13：主页面左上角的看板胶囊
+check('A9 客户端注册 conversation.header.leading 胶囊', () => {
+  const src = fs.readFileSync(path.join(root, 'lib/client.js'), 'utf8');
+  assert.ok(src.includes("'conversation.header.leading'"), '没有注册主页面左上角槽位');
+  assert.ok(src.includes('HeaderDashboard'), '没有胶囊组件');
+});
+check('A10 胶囊展示成交/访客/转化率', () => {
+  const src = fs.readFileSync(path.join(root, 'lib/client.js'), 'utf8');
+  for (const key of ['gmv', 'visitors', 'convRate']) assert.ok(src.includes("'" + key + "'"), '缺指标 ' + key);
+  assert.ok(src.includes("'经营看板'"), '缺胶囊标题');
+});
+check('A11 胶囊样式是圆角胶囊', () => {
+  const src = fs.readFileSync(path.join(root, 'lib/client.js'), 'utf8');
+  assert.ok(src.includes('.sa-pill{'), '缺 .sa-pill 样式');
+  assert.ok(src.includes('.sa-pop{'), '缺弹层样式');
+});
+check('A12 版本 >= 0.2.0', () => assert.ok(parseFloat(pkg.version) >= 0.2));
+check('A13 README 说明主页面左上角展示', () => {
+  const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
+  assert.ok(/左上角/.test(readme), 'README 没说明主页面左上角入口');
+});
+
 // B 组：看板聚合（用真实数据目录；没有就是空看板但也必须是 8 张卡）
 const { buildDashboard } = await import(pathToFileURL(path.join(root, 'lib/dashboard.mjs')).href);
 const { readAccounts, dataDir } = await import(pathToFileURL(path.join(root, 'lib/store.mjs')).href);
