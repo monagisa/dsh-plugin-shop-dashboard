@@ -209,5 +209,28 @@ check('F10 插件清单含 dsh.bundle 与 dsh.client', () => {
   assert.ok(pkg.peerDependencies && pkg.peerDependencies['@deepseek-ai/cordis'], '缺少 cordis peer 依赖');
 });
 
+
+// F11 每张卡带口径说明（派生指标的说明要有公式）
+check('F11 卡片口径说明', () => {
+  const d = buildDashboard({ accounts, group: 'overview', days: 30 });
+  const cards = d.groups[0].cards;
+  for (const c of cards) assert.ok(typeof c.hint === 'string' && c.hint.length > 0, '缺口径：' + c.label);
+  const rev = cards.find((c) => c.id === 'salesRevenue');
+  assert.ok(rev.hint.includes('成交金额') && rev.hint.includes('退款金额') && rev.hint.includes('推广花费'), rev.hint);
+  const aov = cards.find((c) => c.id === 'aov');
+  assert.ok(aov.hint.includes('÷'), aov.hint);
+});
+
+// F12 卡片/表格视图与 CSV 导出
+check('F12 表格视图与 CSV 导出', () => {
+  const src = fs.readFileSync(path.join(root, 'lib/client.js'), 'utf8');
+  for (const fn of ['function tableData', 'function tableOf', 'function csvOf', 'function downloadCsv']) {
+    assert.ok(src.includes(fn), '缺少 ' + fn);
+  }
+  assert.ok(src.includes("'导出 CSV'"), '缺少导出按钮');
+  assert.ok(src.includes('sa-table'), '缺少表格样式');
+  assert.ok(src.includes('\\ufeff') || src.includes('ufeff'), 'CSV 没有 BOM（Excel 会乱码）');
+});
+
 console.log('pass=' + pass + ' fail=' + fail);
 if (fail) process.exit(1);
