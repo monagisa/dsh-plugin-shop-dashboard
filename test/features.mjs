@@ -232,5 +232,32 @@ check('F12 表格视图与 CSV 导出', () => {
   assert.ok(src.includes('\\ufeff') || src.includes('ufeff'), 'CSV 没有 BOM（Excel 会乱码）');
 });
 
+
+// F13 视觉规范：全站单一强调色，其余 tone 只作分组不上色
+check('F13 单一强调色', () => {
+  const src = fs.readFileSync(path.join(root, 'lib/client.js'), 'utf8');
+  assert.ok(src.includes('function toneColor'), '缺少 toneColor');
+  const fn = src.slice(src.indexOf('function toneColor'), src.indexOf('function KpiCard'));
+  assert.ok(fn.includes("tone === 'primary'"), '主色没有映射');
+  assert.ok(fn.includes("tone === 'warn'") && fn.includes("tone === 'danger'"), '语义色没有映射');
+  assert.ok(fn.includes('var(--dsw-alias-label-secondary'), '其余 tone 没有降为中性灰');
+  assert.ok(!fn.includes("tone === 'info'"), 'info 不应再单独上色');
+  assert.ok(!fn.includes("tone === 'purple'"), 'purple 不应再单独上色');
+});
+
+// F14 载入骨架屏 / 空状态 / 克制动效
+check('F14 骨架屏与空状态', () => {
+  const src = fs.readFileSync(path.join(root, 'lib/client.js'), 'utf8');
+  for (const fn of ['function skeletonGrid', 'function isEmptyDash', 'sa-skel', 'sa-empty']) {
+    assert.ok(src.includes(fn), '缺少 ' + fn);
+  }
+  assert.ok(src.includes('sa-breathe'), '骨架屏没有呼吸动效');
+  assert.ok(src.includes('sa-rise'), '卡片没有入场动效');
+  assert.ok(src.includes('prefers-reduced-motion'), '没有 reduced-motion 兜底');
+  assert.ok(src.includes('cubic-bezier(.16,1,.3,1)'), '缓动不是物理曲线');
+  assert.ok(!src.includes('正在读取采集数据'), '载入态不该只有一行文字');
+  assert.ok(src.includes('transform:translateY(1px)'), '按钮缺少按压反馈');
+});
+
 console.log('pass=' + pass + ' fail=' + fail);
 if (fail) process.exit(1);
