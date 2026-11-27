@@ -176,5 +176,38 @@ if (realCards.length >= 4) {
   console.log('（本机没有可用采集数据，C 组跳过）');
 }
 
+
+// F8 商品供给的存量类指标由商品明细派生（商品数/动销/零成交），代码与卡片都要在
+check('F8 商品供给存量指标从商品明细派生', () => {
+  const src = fs.readFileSync(path.join(root, 'lib/dashboard.mjs'), 'utf8');
+  assert.ok(/function fillStockMetrics/.test(src), '缺少 fillStockMetrics');
+  assert.ok(/STOCK_DERIVED_IDS/.test(src), '缺少存量指标清单');
+  const d = buildDashboard({ accounts, group: 'product', days: 30 });
+  const ids = d.groups[0].cards.map((c) => c.id);
+  for (const id of ['productCount', 'activeProducts', 'visitedProducts', 'zeroSalesCount']) {
+    assert.ok(ids.includes(id), '商品供给缺卡片 ' + id);
+  }
+});
+
+// F9 界面支持自定义起止日期
+check('F9 自定义起止日期', () => {
+  const src = fs.readFileSync(path.join(root, 'lib/client.js'), 'utf8');
+  assert.ok(src.includes("key: 'custom'"), '缺少自定义范围选项');
+  assert.ok(/type: 'date'/.test(src), '缺少日期输入框');
+  assert.ok(src.includes("'from=' + fromDay"), '没有把 from/to 传进接口');
+  const r = fs.readFileSync(path.join(root, 'lib/server/routes.mjs'), 'utf8');
+  assert.ok(r.includes('from'), '路由未透传 from');
+});
+
+
+// F10 清单里必须有 dsh.bundle / dsh.client —— 少了这两项宿主根本不会加载本插件
+check('F10 插件清单含 dsh.bundle 与 dsh.client', () => {
+  assert.equal(pkg.dsh && pkg.dsh.manifestVersion, 1, 'dsh.manifestVersion 缺失');
+  assert.equal(pkg.dsh.bundle && pkg.dsh.bundle.patch, './cordis.patch.yml');
+  assert.equal(pkg.dsh.client && pkg.dsh.client.platform, 'web');
+  assert.ok((pkg.dsh.client.inject || []).includes('@deepseek-ai/dsh-client-ui-slots'));
+  assert.ok(pkg.peerDependencies && pkg.peerDependencies['@deepseek-ai/cordis'], '缺少 cordis peer 依赖');
+});
+
 console.log('pass=' + pass + ' fail=' + fail);
 if (fail) process.exit(1);

@@ -1,8 +1,8 @@
 {
   "name": "dsh-plugin-shop-dashboard",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
-  "description": "店铺数据看板：把「店铺账号管理」采集到的报表工作簿聚合成四组经营指标（经营总览/流量转化/商品供给/运营推广），支持时间范围、走势粒度与按平台口径。",
+  "description": "店铺数据看板：把「店铺账号管理」采集到的报表工作簿聚合成四组经营指标（经营总览/流量转化/商品供给/运营推广），支持时间范围（含自定义起止日期）、走势粒度与按平台口径。",
   "keywords": [
     "dsh-plugin",
     "dsh",
@@ -28,5 +28,36 @@
   "scripts": {
     "check": "node tools/check-syntax.mjs",
     "test": "node test/features.mjs"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "dsh": {
+    "manifestVersion": 1,
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/monagisa/dsh-plugin-shop-dashboard.git"
+  },
+  "homepage": "https://github.com/monagisa/dsh-plugin-shop-dashboard#readme",
+  "bugs": {
+    "url": "https://github.com/monagisa/dsh-plugin-shop-dashboard/issues"
   }
 }
