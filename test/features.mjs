@@ -259,5 +259,27 @@ check('F14 骨架屏与空状态', () => {
   assert.ok(src.includes('transform:translateY(1px)'), '按钮缺少按压反馈');
 });
 
+
+// F15 骨架屏尺寸必须与真实卡片一致（换行不跳、行盒等高）
+check('F15 骨架尺寸与卡片一致', () => {
+  const src = fs.readFileSync(path.join(root, 'lib/client.js'), 'utf8');
+  const need = [
+    ['.sa-sklabel{height:17.25px', '.sa-dashlabel 的行盒（11.5px × 1.5）'],
+    ['.sa-skvalue{height:22.95px', '.sa-dashvalue 的行盒（17px × 1.35）'],
+    ['.sa-skdelta{height:16.5px', '.sa-dashdelta 的行盒（11px × 1.5）'],
+    ['.sa-skspark{height:30px', 'sparklineOf 的 svg 高度'],
+  ];
+  for (const [needle, what] of need) {
+    assert.ok(src.includes(needle), '骨架块尺寸没有对齐' + what);
+  }
+  assert.ok(src.includes('function skeletonGrid(count)'), '骨架没有按分组卡数铺');
+  assert.ok(src.includes('sa-skspark'), '骨架缺少走势位');
+  assert.ok(src.includes('SKEL_COUNTS'), '缺少分组卡数表');
+  const counts = src.slice(src.indexOf('SKEL_COUNTS = {'), src.indexOf('SKEL_COUNTS = {') + 120);
+  for (const pair of ['overview: 9', 'traffic: 9', 'product: 10', 'promotion: 8']) {
+    assert.ok(counts.includes(pair), '骨架卡数与注册表不一致：' + pair);
+  }
+  assert.ok(src.includes('body = skeletonGrid(SKEL_COUNTS[group]'), '载入态没有按当前分组铺骨架');
+});
 console.log('pass=' + pass + ' fail=' + fail);
 if (fail) process.exit(1);
